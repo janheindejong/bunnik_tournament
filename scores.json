@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Camel Up",
+        "duration": 60, 
+        "players": ["Niels", "Alewijn", "Roeland", "Scott"],
+        "scores": [0, 0, 0, 2]
+    },
+    {
+        "name": "Machiavelli", 
+        "duration": 181,
+        "players": ["Niels", "Alewijn", "Roeland", "Scott", "Dirk"],
+        "scores": [4, 0, 0, 0, 0]
+    }, 
+    {
+        "name": "BezzerWizzer", 
+        "duration": 46,
+        "players": ["Niels", "Roeland", "Scott", "Dirk", "Jan Hein", "Ruben"],
+        "scores": [0.6666, 0, 0, 0, 0.6667, 0.6667]
+    }
+]
