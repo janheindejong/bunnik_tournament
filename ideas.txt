@@ -29,3 +29,15 @@ POST /game
 - Allocation: list[float]
 
 GET /player/{name}/
+returns JSON with score, etc... 
+
+GET /leaderboard
+
+GET /statistics
+
+
+score = (max(ranks) - rank) / max(ranks)
+
+
+
+

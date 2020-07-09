@@ -1,120 +1,175 @@
+import uuid
 import json
+from typing import NamedTuple
+import sqlite3
+import hashlib
 import time
 
-PLAYER_NAMES = ["Niels", "Dirk", "Alewijn", "Scott", "Jan Hein", "Ruben", "Roeland"]
-
-class Game: 
-
-    TOTAL_POINTS = 0
-    TOTAL_PLAYED = 0
-    TOTAL_DURATION = 0
-
-    def __init__(self, name, players, duration, scores):
-        if len(scores) != len(players): 
-            raise Exception
-        for player in players: 
-            if player not in PLAYER_NAMES: 
-                raise Exception
-        if duration <= 45:
-            if sum(scores) != 1: 
-                raise Exception
-        elif duration <= 90:
-            if sum(scores) != 2: 
-                raise Exception
-        elif duration <= 180: 
-            if sum(scores) != 3:
-                raise Exception
-        else:
-            if sum(scores) != 4: 
-                raise Exception
-        self.name = name 
-        self.duration = duration
-        self.players = players 
-        self.scores = scores
-        Game.TOTAL_PLAYED += 1
-        Game.TOTAL_POINTS += self.points
-        Game.TOTAL_DURATION += self.duration
-        
-    @property
-    def points(self):
-        return sum(self.scores)
-
-    def player_points(self, name):
-        return self.scores[self.players.index(name)]
-
-    @classmethod
-    def from_dict(cls, game):
-        return cls(**game)
+import pandas as pd
 
 
-class Player: 
+WEIGHT_PERFORMANCE = 0.75  # Relative importance of winning versus participating
+DATABASE_URL = "bunnik_boys_gaming_tournament.db"
 
-    def __init__(self, name):
-        self.name = name
-        self.games = []
 
-    @property 
-    def score(self):
-        try: 
-            return 50 * (self.total_won / self.total_played) + 50 * (self.total_played / Game.TOTAL_POINTS)
-        except ZeroDivisionError: 
-            return 0
+class AlreadyExists(Exception):
+    """Raised if entry already exists in database"""
 
-    def add_game(self, game: Game): 
-        if self.name in game.players: 
-            # self.total_won += game.player_score(self.name)
-            # self.total_played += game.points
-            self.games.append(game)
-    
-    @property 
-    def total_won(self):
-        return sum([game.player_points(self.name) for game in self.games])
 
-    @property
-    def total_played(self):
-        return sum([game.points for game in self.games])
+class Game(NamedTuple):
+    game_id: str
+    name: str
+    datetime: str
+    duration: int
+    points: int
 
-    def __str__(self):
-        return f"Player {self.name} has a score of {self.score:.2f} and participated in {len(self.games)} games"
 
-    def __lt__(self, other): 
-        if self.score < other.score:
-            return True 
-        else: 
-            return False
+class Participation(NamedTuple):
+    game_id: str
+    player: str
+    rank: int
+    score: float
 
-# Create players
-players = [Player(name) for name in PLAYER_NAMES]
 
-# Read games
-with open('scores.json') as f:
-    games = [Game.from_dict(game) for game in json.load(f)]
-    
-# Add games to players
-for game in games:
-    for player in players: 
-        player.add_game(game)
-players.sort()
+def init_db():
+    with sqlite3.connect(DATABASE_URL) as conn:
+        conn.execute(
+            """ 
+            CREATE TABLE IF NOT EXISTS games 
+            (game_id text, name text, datetime text, duration int, points int)
+            """
+        )
+        conn.execute(
+            """ 
+            CREATE TABLE IF NOT EXISTS participations 
+            (game_id text, player text, rank int, score real)
+            """
+        )
 
-# Print output
-print("Allright... here we go!!\n")
 
-print(
-    f"Total number of games played is {Game.TOTAL_PLAYED}, " 
-    f"with a duration of {Game.TOTAL_DURATION} minutes, "
-    f"and a total of {Game.TOTAL_POINTS:.0f} points to be earned..."
-)
+def post_game(**kwargs):
+    game, participations = _parse_game_dict(**kwargs)
+    with sqlite3.connect(DATABASE_URL) as conn:
+        if conn.execute(
+            "SELECT 1 FROM games WHERE game_id = ?", (game.game_id,)
+        ).fetchone():
+            raise AlreadyExists("Entry already exists")
+        conn.execute(
+            """
+            INSERT INTO 
+                games 
+            VALUES 
+                (?, ?, ?, ?, ?)
+            """,
+            game,
+        )
+        conn.executemany(
+            """
+            INSERT INTO 
+                participations 
+            VALUES 
+                (?, ?, ?, ?)
+            """,
+            participations,
+        )
 
-time.sleep(3)
 
-print("\nAnd now for the individual scores...\n")
+def read_stuff():
+    conn = sqlite3.connect(DATABASE_URL)
+    c = conn.execute("""SELECT * FROM games""")
+    for game in c:
+        print(game)
 
-time.sleep(2)
-for player in players[:-1]: 
-    print(player)
-    time.sleep(2)
 
-print(f"\nAnd with a score of {players[-1].score:.2f}, the leader is... *DRUMROLL*\n")
-time.sleep(3)
-print(players[-1].name.upper() + "!!!!")
-print()
+def get_scores():
+    conn = sqlite3.connect(DATABASE_URL)
+    TOTAL_POINTS = conn.execute("SELECT SUM(points) FROM games").fetchone()[0]
+    c = conn.execute(
+        """
+        SELECT 
+            player, 
+            ROUND(100 * performance, 1), 
+            ROUND(100 * participation, 1), 
+            ROUND(100 * (:weight * performance + (1 - :weight) * participation), 1) AS score
+        FROM 
+        (
+            SELECT 
+                player AS player,
+                SUM(score) / SUM(points) AS performance,
+                SUM(points) / CAST(:total_points AS float) AS participation
+            FROM 
+                games 
+            INNER JOIN participations ON participations.game_id = games.game_id
+            GROUP BY 
+                player
+        )
+        ORDER BY 
+            score
+        """,
+        {"weight": WEIGHT_PERFORMANCE, "total_points": TOTAL_POINTS},
+    )
+    for player in c:
+        print(player)
+
+
+def main():
+    init_db()
+    with open("scores.json") as f:
+        for game in json.load(f):
+            game["game_id"] = _generate_game_id(**game)
+            try:
+                post_game(**game)
+            except AlreadyExists:
+                print(f"Game with ID {game['game_id']} already exists!")
+    read_stuff()
+    t = time.time()
+    get_scores()
+    print(f"This took {time.time() - t} seconds")
+
+
+def _parse_game_dict(game_id, name, datetime, duration, ranking):
+    points = _game_points(duration)
+    game = Game(game_id, name, datetime, duration, points)
+    participations = []
+    max_rank = max(ranking.values())
+    for player, rank in ranking.items():
+        score = points * (max_rank - rank) / (max_rank - 1)
+        participations.append(Participation(game_id, player, rank, score))
+    return game, participations
+
+
+def _generate_game_id(**kwargs):
+    b = str(kwargs).encode("ascii")
+    return hashlib.sha1(b).hexdigest()
+
+
+def _game_points(duration):
+    if duration < 45:
+        return 1
+    elif duration < 90:
+        return 2
+    elif duration < 180:
+        return 3
+    else:
+        return 4
+
+
+if __name__ == "__main__":
+    main()
+
+
+# def main():
+#     games_df = pd.DataFrame()
+#     participations_df = pd.DataFrame()
+#     with open("scores.json") as f:
+#         for game in json.load(f):
+#             game, participations = _parse_game_dict(**game)
+#             games_df = games_df.append(pd.DataFrame([game]))
+#             participations_df = participations_df.append(pd.DataFrame(participations))
+#     df = pd.merge(games_df, participations_df, on="game_id")
+#     scores = 100 * (
+#         RATIO * df.groupby("player").score.sum() / df.groupby("player").points.sum()
+#         + (1 - RATIO) * df.groupby("player").points.sum() / games_df.points.sum()
+#     )
+#     print(scores.sort_values())
+#     print(games_df.duration.sum())
