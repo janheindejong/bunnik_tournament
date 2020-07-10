@@ -39,6 +39,7 @@ def init_db():
                 duration int, 
                 points int,
                 PRIMARY KEY (id)
+                UNIQUE (id)
             )
             """
         )
@@ -58,8 +59,6 @@ def init_db():
 def post_game(**kwargs):
     game, participations = _parse_game_dict(**kwargs)
     with sqlite3.connect(DATABASE_URL) as conn:
-        if conn.execute("SELECT 1 FROM games WHERE id = ?", (game.id,)).fetchone():
-            raise AlreadyExists(f"Game with id {game.id} already exists")
         conn.execute(
             """
             INSERT INTO 
@@ -82,9 +81,12 @@ def post_game(**kwargs):
 
 def read_stuff():
     conn = sqlite3.connect(DATABASE_URL)
-    c = conn.execute("""SELECT * FROM games """)
+    c = conn.execute("SELECT * FROM games")
     for game in c:
         print(game)
+    c = conn.execute("SELECT * FROM participations")
+    for partipation in c:
+        print(partipation)
 
 
 def get_scores():
@@ -116,9 +118,7 @@ def get_scores():
         )
         for player in c:
             print(
-                "{} won {}%, participated in {}% and has an overall score of {}%".format(
-                    *player
-                )
+                "{} won {}%, participated in {}% and has a score of {}%".format(*player)
             )
 
 
@@ -126,10 +126,9 @@ def main():
     init_db()
     with open("scores.json") as f:
         for game in json.load(f):
-            game["id"] = _generate_game_id(**game)
             try:
                 post_game(**game)
-            except AlreadyExists as err:
+            except sqlite3.IntegrityError as err:
                 print(err)
     read_stuff()
     t = time.time()
@@ -137,8 +136,9 @@ def main():
     print(f"This took {time.time() - t} seconds")
 
 
-def _parse_game_dict(id, name, datetime, duration, ranking):
-    points = _game_points(duration)
+def _parse_game_dict(name, datetime, duration, ranking):
+    id = _generate_game_id(name, datetime, duration, ranking)
+    points = _extract_game_points(duration)
     game = Game(id, name, datetime, duration, points)
     participations = []
     max_rank = max(ranking.values())
@@ -148,12 +148,12 @@ def _parse_game_dict(id, name, datetime, duration, ranking):
     return game, participations
 
 
-def _generate_game_id(**kwargs):
-    b = str(kwargs).encode("ascii")
+def _generate_game_id(*args):
+    b = str(args).encode("ascii")
     return hashlib.sha1(b).hexdigest()
 
 
-def _game_points(duration):
+def _extract_game_points(duration):
     if duration < 45:
         return 1
     elif duration < 90:
