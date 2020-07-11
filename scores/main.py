@@ -12,17 +12,20 @@ Base.metadata.create_all(engine)
 # FastAPI app
 app = FastAPI()
 
+
 def get_db():
     db = SessionLocal()
-    try: 
+    try:
         yield db
-    finally: 
+    finally:
         db.close()
 
 
 @app.post("/game")
 def post_game(game: schemas.Game, db: Session = Depends(get_db)):
-    return crud.create_new_game(db, game.name, game.datetime, game.duration, game.ranking)
+    return crud.create_new_game(
+        db, game.name, game.datetime, game.duration, game.ranking
+    )
 
 
 @app.get("/scores")

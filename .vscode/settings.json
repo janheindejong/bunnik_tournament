@@ -2,5 +2,8 @@
     "editor.rulers": [
         88
     ],
-    "python.pythonPath": "c:\\Soft_Dev\\Scores_Bunnik\\venv\\Scripts\\python.exe"
+    "python.pythonPath": "c:\\Soft_Dev\\Scores_Bunnik\\venv\\Scripts\\python.exe", 
+    "python.linting.pylintArgs": [
+        "--generated-members", "pydantic.* sqlalchemy.orm.*"
+    ]
 }

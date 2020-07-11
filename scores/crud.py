@@ -1,8 +1,5 @@
 """Database"""
 
-from datetime import datetime
-import json
-
 import dateutil.parser
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -56,9 +53,8 @@ def create_new_game(db: Session, name, datetime, duration, ranking):
 def _extract_game_points(duration):
     if duration < 45:
         return 1
-    elif duration < 90:
+    if duration < 90:
         return 2
-    elif duration < 180:
+    if duration < 180:
         return 3
-    else:
-        return 4
+    return 4
