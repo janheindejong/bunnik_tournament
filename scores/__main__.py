@@ -1,11 +1,10 @@
 """For testing purposes"""
 import json
 from .crud import create_new_game, get_scores
+from .database import Base, SessionLocal, engine
 
 
 def main():
-    from .database import Base, SessionLocal, engine
-
     Base.metadata.create_all(engine)
     db = SessionLocal()
     with open("games.json") as f:

@@ -10,6 +10,15 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        }, 
+        {
+            "name": "Tournament API",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn", 
+            "args": ["scores.main:app", "--reload"], 
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true
         }
     ]
 }

@@ -27,7 +27,7 @@ def get_scores(db: Session, players: list):
         stmt.c.performance,
         stmt.c.participation,
         (0.75 * stmt.c.performance + 0.25 * stmt.c.participation).label("score"),
-    )
+    ).order_by("score")
     return query.all()
 
 
