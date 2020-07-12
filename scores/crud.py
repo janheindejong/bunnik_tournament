@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .models import Game, Participation
 
 
-def get_scores(db: Session, players: list):
+def get_scores(db: Session):
     total = db.query(func.sum(Game.points)).scalar()
     stmt = (
         db.query(
