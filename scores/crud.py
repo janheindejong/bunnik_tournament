@@ -12,13 +12,14 @@ def get_scores(db: Session, players: list):
     stmt = (
         db.query(
             Participation.player,
-            (func.sum(Participation.points) / func.sum(Game.points)).label(
-                "performance"
+            (
+                func.round(100 * func.sum(Participation.points) / func.sum(Game.points))
+            ).label("performance"),
+            (func.round(100 * func.sum(Game.points) / float(total))).label(
+                "participation"
             ),
-            (func.sum(Game.points) / float(total)).label("participation"),
         )
         .join(Game)
-        .filter(Participation.player.in_(players))
         .group_by(Participation.player)
         .subquery()
     )
@@ -26,7 +27,9 @@ def get_scores(db: Session, players: list):
         stmt.c.player,
         stmt.c.performance,
         stmt.c.participation,
-        (0.75 * stmt.c.performance + 0.25 * stmt.c.participation).label("score"),
+        func.round(0.67 * stmt.c.performance + 0.33 * stmt.c.participation).label(
+            "score"
+        ),
     ).order_by("score")
     return query.all()
 
