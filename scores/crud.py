@@ -34,6 +34,10 @@ def get_scores(db: Session, players: list):
     return query.all()
 
 
+def get_games(db: Session):
+    return db.query(Game).all()
+
+
 def create_new_game(db: Session, name, datetime, duration, ranking):
     points = _extract_game_points(duration)
     datetime = dateutil.parser.parse(datetime)

@@ -30,13 +30,18 @@ def get_db():
         db.close()
 
 
-@app.post("/game")
+@app.post("/games")
 def post_game(game: schemas.Game, db: Session = Depends(get_db)):
     return crud.create_new_game(
         db, game.name, game.datetime, game.duration, game.ranking
     )
 
 
+@app.get("/games")
+def get_games(db: Session = Depends(get_db)): 
+    return crud.get_games(db)
+
+
 @app.get("/scores")
 def get_scores(db: Session = Depends(get_db)):
-    return [s._asdict() for s in crud.get_scores(db, ["Jan Hein", "Ruben"])]
+    return [s._asdict() for s in crud.get_scores(db)]
