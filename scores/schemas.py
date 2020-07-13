@@ -1,13 +1,18 @@
 """FastAPI schemas"""
 
-from typing import Dict
+from typing import List
 from datetime import datetime
 
 from pydantic import BaseModel
+
+
+class Participant(BaseModel):
+    player: str
+    rank: int
 
 
 class Game(BaseModel):
     name: str
     datetime: datetime
     duration: int
-    ranking: Dict[str, int]
+    participants: List[Participant]

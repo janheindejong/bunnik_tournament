@@ -38,17 +38,21 @@ def get_games(db: Session):
     return db.query(Game).all()
 
 
-def create_new_game(db: Session, name, datetime, duration, ranking):
+def create_new_game(db: Session, name, datetime, duration, participants):
     points = _extract_game_points(duration)
-    datetime = dateutil.parser.parse(datetime)
+    datetime = (
+        dateutil.parser.parse(datetime) if isinstance(datetime, str) else datetime
+    )
     game = Game(name=name, datetime=datetime, duration=duration, points=points)
-    max_rank = max(ranking.values())
-    for player, rank in ranking.items():
+    max_rank = 0
+    for participant in participants:
+        max_rank = max(max_rank, participant.rank)
+    for participant in participants:
         game.participations.append(
             Participation(
-                player=player,
-                rank=rank,
-                points=points * (max_rank - rank) / (max_rank - 1),
+                player=participant.player,
+                rank=participant.rank,
+                points=points * (max_rank - participant.rank) / (max_rank - 1),
             )
         )
     db.add(game)

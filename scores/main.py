@@ -33,12 +33,12 @@ def get_db():
 @app.post("/games")
 def post_game(game: schemas.Game, db: Session = Depends(get_db)):
     return crud.create_new_game(
-        db, game.name, game.datetime, game.duration, game.ranking
+        db, game.name, game.datetime, game.duration, game.participants
     )
 
 
 @app.get("/games")
-def get_games(db: Session = Depends(get_db)): 
+def get_games(db: Session = Depends(get_db)):
     return crud.get_games(db)
 
 
