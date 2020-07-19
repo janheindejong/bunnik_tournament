@@ -1,3 +1,3 @@
-PYTHONPATH=$(pwd)
+export PYTHONPATH=$(pwd)
 
 python3 ./initial_data.py
