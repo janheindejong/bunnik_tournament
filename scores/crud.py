@@ -1,10 +1,13 @@
 """Database"""
 
-import dateutil.parser
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .models import Game, Participation
+from .schemas import GameCreate
+
+WEIGHT_PERFORMANCE = 0.5
+WEIGHT_PARTICIPATION = 1 - WEIGHT_PERFORMANCE
 
 
 def get_scores(db: Session):
@@ -27,9 +30,10 @@ def get_scores(db: Session):
         stmt.c.player,
         stmt.c.performance,
         stmt.c.participation,
-        func.round(0.67 * stmt.c.performance + 0.33 * stmt.c.participation).label(
-            "score"
-        ),
+        func.round(
+            WEIGHT_PERFORMANCE * stmt.c.performance
+            + WEIGHT_PARTICIPATION * stmt.c.participation
+        ).label("score"),
     ).order_by("score")
     return query.all()
 
@@ -38,21 +42,22 @@ def get_games(db: Session):
     return db.query(Game).all()
 
 
-def create_new_game(db: Session, name, datetime, duration, participants):
-    points = _extract_game_points(duration)
-    datetime = (
-        dateutil.parser.parse(datetime) if isinstance(datetime, str) else datetime
+def create_new_game(db: Session, obj_in: GameCreate):
+    game = Game(
+        name=obj_in.name,
+        datetime=obj_in.datetime,
+        duration=obj_in.duration,
+        points=_extract_game_points(obj_in.duration),
     )
-    game = Game(name=name, datetime=datetime, duration=duration, points=points)
     max_rank = 0
-    for participant in participants:
+    for participant in obj_in.participants:
         max_rank = max(max_rank, participant.rank)
-    for participant in participants:
+    for participant in obj_in.participants:
         game.participations.append(
             Participation(
                 player=participant.player,
                 rank=participant.rank,
-                points=points * (max_rank - participant.rank) / (max_rank - 1),
+                points=game.points * (max_rank - participant.rank) / (max_rank - 1),
             )
         )
     db.add(game)

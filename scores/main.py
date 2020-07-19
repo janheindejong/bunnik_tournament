@@ -1,14 +1,10 @@
 """FastAPI app"""
-from typing import List
-
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from .database import Base, SessionLocal, engine
-from . import schemas, crud
-
-Base.metadata.create_all(engine)
+from . import crud, schemas
+from .database import SessionLocal
 
 # FastAPI app
 app = FastAPI()
@@ -31,10 +27,8 @@ def get_db():
 
 
 @app.post("/games")
-def post_game(game: schemas.Game, db: Session = Depends(get_db)):
-    return crud.create_new_game(
-        db, game.name, game.datetime, game.duration, game.participants
-    )
+def post_game(game: schemas.GameCreate, db: Session = Depends(get_db)):
+    return crud.create_new_game(db, game)
 
 
 @app.get("/games")

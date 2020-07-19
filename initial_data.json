@@ -1,0 +1,261 @@
+[
+    {
+        "name": "Camel Up",
+        "duration": 60,
+        "datetime": "2020-07-05T13:00+02:00",
+        "participants": [
+            {
+                "player": "Niels",
+                "rank": 2
+            },
+            {
+                "player": "Alewijn",
+                "rank": 3
+            },
+            {
+                "player": "Roeland",
+                "rank": 4
+            },
+            {
+                "player": "Scott",
+                "rank": 1
+            }
+        ]
+    },
+    {
+        "name": "Machiavelli",
+        "duration": 181,
+        "datetime": "2020-07-05T16:00+02:00",
+        "participants": [
+            {
+                "player": "Niels",
+                "rank": 1
+            },
+            {
+                "player": "Alewijn",
+                "rank": 2
+            },
+            {
+                "player": "Roeland",
+                "rank": 2
+            },
+            {
+                "player": "Scott",
+                "rank": 2
+            },
+            {
+                "player": "Dirk",
+                "rank": 3
+            }
+        ]
+    },
+    {
+        "name": "BezzerWizzer",
+        "duration": 46,
+        "datetime": "2020-07-05T20:00+02:00",
+        "participants": [
+            {
+                "player": "Niels",
+                "rank": 1
+            },
+            {
+                "player": "Roeland",
+                "rank": 2
+            },
+            {
+                "player": "Scott",
+                "rank": 2
+            },
+            {
+                "player": "Dirk",
+                "rank": 2
+            },
+            {
+                "player": "Jan Hein",
+                "rank": 1
+            },
+            {
+                "player": "Ruben",
+                "rank": 1
+            }
+        ]
+    },
+    {
+        "name": "Machiavelli",
+        "duration": 160,
+        "datetime": "2020-07-06T19:00+02:00",
+        "participants": [
+            {
+                "player": "Niels",
+                "rank": 2
+            },
+            {
+                "player": "Roeland",
+                "rank": 1
+            },
+            {
+                "player": "Scott",
+                "rank": 3
+            },
+            {
+                "player": "Dirk",
+                "rank": 4
+            },
+            {
+                "player": "Jan Hein",
+                "rank": 5
+            },
+            {
+                "player": "Alewijn",
+                "rank": 6
+            }
+        ]
+    },
+    {
+        "name": "BezzerWizzer",
+        "duration": 120,
+        "datetime": "2020-07-07T19:00+02:00",
+        "participants": [
+            {
+                "player": "Niels",
+                "rank": 4
+            },
+            {
+                "player": "Roeland",
+                "rank": 3
+            },
+            {
+                "player": "Scott",
+                "rank": 2
+            },
+            {
+                "player": "Dirk",
+                "rank": 2
+            },
+            {
+                "player": "Jan Hein",
+                "rank": 3
+            },
+            {
+                "player": "Alewijn",
+                "rank": 4
+            },
+            {
+                "player": "Ruben",
+                "rank": 1
+            }
+        ]
+    },
+    {
+        "name": "Codenames",
+        "duration": 20,
+        "datetime": "2020-07-07T23:30+02:00",
+        "participants": [
+            {
+                "player": "Niels",
+                "rank": 1
+            },
+            {
+                "player": "Roeland",
+                "rank": 2
+            },
+            {
+                "player": "Scott",
+                "rank": 1
+            },
+            {
+                "player": "Dirk",
+                "rank": 1
+            },
+            {
+                "player": "Jan Hein",
+                "rank": 2
+            },
+            {
+                "player": "Alewijn",
+                "rank": 2
+            },
+            {
+                "player": "Ruben",
+                "rank": 2
+            }
+        ]
+    },
+    {
+        "name": "Machiavelli",
+        "duration": 90,
+        "datetime": "2020-07-08T11:00+02:00",
+        "participants": [
+            {
+                "player": "Roeland",
+                "rank": 1
+            },
+            {
+                "player": "Alewijn",
+                "rank": 2
+            },
+            {
+                "player": "Dirk",
+                "rank": 3
+            }
+        ]
+    },
+    {
+        "name": "BezzerWizzer",
+        "duration": 94,
+        "datetime": "2020-07-08T15:00+02:00",
+        "participants": [
+            {
+                "player": "Ruben",
+                "rank": 1
+            },
+            {
+                "player": "Alewijn",
+                "rank": 2
+            },
+            {
+                "player": "Niels",
+                "rank": 2
+            },
+            {
+                "player": "Dirk",
+                "rank": 3
+            },
+            {
+                "player": "Roeland",
+                "rank": 3
+            }
+        ]
+    },
+    {
+        "name": "BezzerWizzer",
+        "duration": 94,
+        "datetime": "2020-07-08T19:00+02:00",
+        "participants": [
+            {
+                "player": "Ruben",
+                "rank": 1
+            },
+            {
+                "player": "Alewijn",
+                "rank": 3
+            },
+            {
+                "player": "Niels",
+                "rank": 4
+            },
+            {
+                "player": "Dirk",
+                "rank": 3
+            },
+            {
+                "player": "Roeland",
+                "rank": 1
+            },
+            {
+                "player": "Jan Hein",
+                "rank": 2
+            }
+        ]
+    }
+]

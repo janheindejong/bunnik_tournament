@@ -1,7 +1,7 @@
 """FastAPI schemas"""
 
-from typing import List
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
 
@@ -11,8 +11,12 @@ class Participant(BaseModel):
     rank: int
 
 
-class Game(BaseModel):
+class GameBase(BaseModel):
     name: str
     datetime: datetime
     duration: int
     participants: List[Participant]
+
+
+class GameCreate(GameBase):
+    pass

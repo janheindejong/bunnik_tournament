@@ -1,5 +1,6 @@
 """For testing purposes"""
 import json
+
 from .crud import create_new_game, get_scores
 from .database import Base, SessionLocal, engine
 
