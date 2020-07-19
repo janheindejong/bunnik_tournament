@@ -1,3 +1,3 @@
 PYTHONPATH=$(pwd)
 
-python ./scores/initial_data.py
+python ./initial_data.py
