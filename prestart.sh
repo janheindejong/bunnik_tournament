@@ -1,3 +1,3 @@
 PYTHONPATH=$(pwd)
 
-python ./initial_data.py
+python3 ./initial_data.py
