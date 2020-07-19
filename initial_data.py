@@ -18,8 +18,8 @@ def main():
     # Parse json
     with open(FILENAME_INTIAL_DATA, "r") as f:
         for game in json.load(f):
-            game = GameCreate(**game)
-            crud.create_new_game(db, game)
+            game_create = GameCreate(**game)
+            crud.create_new_game(db, game_create)
 
 
 if __name__ == "__main__":
