@@ -1,7 +1,5 @@
 """Database"""
 
-from json import dumps
-
 from sqlalchemy import func
 from sqlalchemy.orm import Session, selectinload
 

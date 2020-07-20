@@ -13,7 +13,6 @@ User your browser to navigate to `localhost:8000/docs`, and have some fun.
 
 ## Todo
 
-- Typing for API
 - Delete games
 - Front-end
 - Add players table to be able to select by ID
