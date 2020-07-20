@@ -1,29 +1,44 @@
 """Database"""
 
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from json import dumps
 
-from .models import Game, Participation
+from sqlalchemy import func
+from sqlalchemy.orm import Session, selectinload
+
+from .models import Game, Participant
 from .schemas import GameCreate
 
 WEIGHT_PERFORMANCE = 0.5
 WEIGHT_PARTICIPATION = 1 - WEIGHT_PERFORMANCE
 
 
+def to_json(model):
+    """ Returns a JSON representation of an SQLAlchemy-backed object.
+    """
+    json = {}
+    json['fields'] = {}
+    json['pk'] = getattr(model, 'id')
+
+    for col in model._sa_class_manager.mapper.mapped_table.columns:
+        json['fields'][col.name] = getattr(model, col.name)
+
+    return dumps([json])
+
+
 def get_scores(db: Session):
     total = db.query(func.sum(Game.points)).scalar()
     stmt = (
         db.query(
-            Participation.player,
+            Participant.player,
             (
-                func.round(100 * func.sum(Participation.points) / func.sum(Game.points))
+                func.round(100 * func.sum(Participant.points) / func.sum(Game.points))
             ).label("performance"),
             (func.round(100 * func.sum(Game.points) / float(total))).label(
                 "participation"
             ),
         )
         .join(Game)
-        .group_by(Participation.player)
+        .group_by(Participant.player)
         .subquery()
     )
     query = db.query(
@@ -39,7 +54,7 @@ def get_scores(db: Session):
 
 
 def get_games(db: Session):
-    return db.query(Game).all()
+    return db.query(Game).options(selectinload(Game.participants)).all()
 
 
 def create_new_game(db: Session, obj_in: GameCreate):
@@ -53,8 +68,8 @@ def create_new_game(db: Session, obj_in: GameCreate):
     for participant in obj_in.participants:
         max_rank = max(max_rank, participant.rank)
     for participant in obj_in.participants:
-        game.participations.append(
-            Participation(
+        game.participants.append(
+            Participant(
                 player=participant.player,
                 rank=participant.rank,
                 points=game.points * (max_rank - participant.rank) / (max_rank - 1),

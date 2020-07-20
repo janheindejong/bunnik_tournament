@@ -14,11 +14,11 @@ class Game(Base):
     datetime = Column(DateTime)
     duration = Column(Integer)
     points = Column(Integer)
-    participations = relationship("Participation")
+    participants = relationship("Participant")
 
 
-class Participation(Base):
-    __tablename__ = "participations"
+class Participant(Base):
+    __tablename__ = "participants"
 
     id = Column(Integer, primary_key=True)
     player = Column(String)
