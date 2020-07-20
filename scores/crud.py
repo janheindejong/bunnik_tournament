@@ -12,19 +12,6 @@ WEIGHT_PERFORMANCE = 0.5
 WEIGHT_PARTICIPATION = 1 - WEIGHT_PERFORMANCE
 
 
-def to_json(model):
-    """ Returns a JSON representation of an SQLAlchemy-backed object.
-    """
-    json = {}
-    json['fields'] = {}
-    json['pk'] = getattr(model, 'id')
-
-    for col in model._sa_class_manager.mapper.mapped_table.columns:
-        json['fields'][col.name] = getattr(model, col.name)
-
-    return dumps([json])
-
-
 def get_scores(db: Session):
     total = db.query(func.sum(Game.points)).scalar()
     stmt = (

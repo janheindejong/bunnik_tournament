@@ -6,7 +6,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-class ParticipantBase(BaseModel): 
+class ParticipantBase(BaseModel):
     player: str
     rank: int
 
@@ -17,7 +17,7 @@ class ParticipantCreate(ParticipantBase):
 
 class Participant(ParticipantBase):
     id: int
-    game_id: int 
+    game_id: int
     points: float
 
     class Config:
@@ -28,7 +28,7 @@ class GameBase(BaseModel):
     name: str
     datetime: datetime
     duration: int
-    
+
 
 class GameCreate(GameBase):
     participants: List[ParticipantCreate]
@@ -45,6 +45,6 @@ class Game(GameBase):
 
 class Score(BaseModel):
     player: str
-    participation: float 
-    performance: float 
+    participation: float
+    performance: float
     score: float
